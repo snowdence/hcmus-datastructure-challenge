@@ -133,13 +133,32 @@ public:
 		return  string(1, expr[i++]);
 
 	}
+	
+	bool basic_validate_infix(string infix_exp) {
+		string expr  =ArHelper::trim(infix_exp);
+		expr.erase(remove(expr.begin(), expr.end(), ' '), expr.end());
+		char t1, t2;
+		for(int i= 0; i < expr.size() - 1; i ++) 
+		{
+			t1 = expr[i];
+			t2 = expr[i + 1];
+			if (isOperator(t1) && isOperator(t2)) {
+				return false;
+			}
+		}
+		return true;
+	}
 	ArExp infix_to_postfix() {
 		ArExp result;
 		string expr = _arexp.to_string();
+		if (basic_validate_infix(expr) == false) {
+			cout << "Error infix" << endl;
+			throw InvalidExpressionException();
+		}
 		int i = 0;
 		string tok = "";
 		stack<string> S;
-		stack<string> O;
+		vector<string> O;
 		while ((tok = next_token(i)) != "") {
 
 #ifdef AR_EXP_DEBUG
@@ -150,44 +169,63 @@ public:
 			else if (tok == ")") {
 				while (!S.empty() && S.top() != "(") {
 					string s_top = S.top();
-					O.push(s_top);
+					O.push_back(s_top);
 					S.pop();
 				}
-				if (S.empty()) {
-					throw MismatchedParenthesisException();
-				}
+				if (S.empty()) throw MismatchedParenthesisException();
 				S.pop();
 			}
 			else if (isOperator(tok[0])) {
 				while (!S.empty() && isOperator(S.top()[0]) && ((leftAssoc(tok[0]) && priority(tok[0]) <= priority(S.top()[0])) || (!leftAssoc(tok[0]) && priority(tok[0]) < priority(S.top()[0]))))
 				{
 					string s_top = S.top();
-					O.push(s_top);
+					O.push_back(s_top);
 					S.pop();
 				}
 				S.push(tok);
 			}
 			else {
-				O.push(tok);
+				O.push_back(tok);
 			}
 		}
 		while (!S.empty()) {
-			if (!isOperator(S.top()[0])) {
-				throw MismatchedParenthesisException();
-			}
+			if (!isOperator(S.top()[0])) throw MismatchedParenthesisException();
 			string s_top = S.top();
-			O.push(s_top);
+			O.push_back(s_top);
 			S.pop();
 		}
 
-		if (O.empty()) {
-			throw exception("Invalid expression.");
-		}
+		if (O.empty()) throw InvalidExpressionException();
+		
 		string temp = "";
-		while (!O.empty()) {
-			temp = O.top() + " "+ temp;
-			O.pop();
+		int cur_tk_value = 0;
+		stack<int> evalutate;
+		for(int i = 0; i < O.size() ;i++) {
+			string cur_tk_str = O[i];
+
+			if (!isOperator(cur_tk_str[0])) {
+				//operant
+				cur_tk_value = atoi(cur_tk_str.c_str());
+				evalutate.push(cur_tk_value);
+			}
+			else {
+				
+				int val1 = evalutate.top();
+				evalutate.pop();
+				int val2 = evalutate.top();
+				evalutate.pop();
+				switch (cur_tk_str[0])
+				{
+				case '+': evalutate.push(val2 + val1); break;
+				case '-':  evalutate.push(val2 - val1); break;
+				case '*':  evalutate.push(val2 * val1); break;
+				case '/':  evalutate.push(val2 / val1); break;
+				}
+			}
+			temp += " " + O[i];
 		}
+		
+
 		temp = ArHelper::trim(temp);
 #ifdef AR_EXP_DEBUG
 		cout << "[" << temp << "]" << endl;

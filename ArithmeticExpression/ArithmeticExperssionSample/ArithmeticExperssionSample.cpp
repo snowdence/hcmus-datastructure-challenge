@@ -1,9 +1,9 @@
 /* This program converts infix expression to postfix expression.
-Â * This program assume that there are Five operators: (*, /, +, -,^)
+ * This program assume that there are Five operators: (*, /, +, -,^)
 	in infix expression and operands can be of single-digit only.
-Â * This program will not work for fractional numbers.
-Â * Further this program does not check whether infix expression is
-Â valid or not in terms of number of operators and operands.*/
+ * This program will not work for fractional numbers.
+ * Further this program does not check whether infix expression is
+ valid or not in terms of number of operators and operands.*/
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h> /* for exit() */
@@ -12,8 +12,8 @@
 
 #define SIZE 100
 
-/* declared here as global variable because stack[]
- * is used by more than one fucntions */
+ /* declared here as global variable because stack[]
+  * is used by more than one fucntions */
 char stack[SIZE];
 int top = -1;
 
@@ -109,7 +109,11 @@ void InfixToPostfix(char infix_exp[], char postfix_exp[])
 
 	while (item != '\0') /* run loop till end of infix expression */
 	{
-
+		if (item == ' ') {
+			i++;
+			item = infix_exp[i];
+			continue;
+		}
 		if (item == '(')
 		{
 			push(item);
@@ -186,7 +190,8 @@ int main()
 	* */
 	char temp[SIZE];
 
-	strncpy(infix, "3^2/(5*3)+10", SIZE);
+	//strncpy(infix, "3^2/(5*3)+10", SIZE);
+	strncpy(infix, "4 4 3 +", SIZE);
 
 	InfixToPostfix(infix, postfix); /* call to convert */
 	printf("Postfix Expression: ");

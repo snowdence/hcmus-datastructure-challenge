@@ -18,6 +18,13 @@ public:
 		this->set_exp_str(exp);
 		_exp_form = (ExpForm::INFIX_EXP);
 	}
+	
+	bool isValid() {
+		return true;
+	}
+	int evaluate(){
+		return -1;
+	}
 
 	ArExp(string exp, ExpForm form)  {
 		_exp = (exp);
