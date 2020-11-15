@@ -5,7 +5,7 @@
 using namespace std;
 int main()
 {
-	ArExp exp("[(2 + 3) ^ 3] * 2");
+	ArExp exp("[(2.01 + 3.20) * 3 + 2] * 2");
 	cout << exp.to_string() << endl;;
 	ArExpConverter converter(exp);
 	cout << "Convert to postfix: " << endl;
@@ -13,6 +13,7 @@ int main()
 	try {
 		ArExp converted = converter.infix_to_postfix();
 		std::cout << converted.to_string() << endl;
+		std::cout << "Evaluate = " << converter.evaluate() << endl;
 	}
 	catch (MismatchedParenthesisException e) {
 		cout << e.what() << endl;

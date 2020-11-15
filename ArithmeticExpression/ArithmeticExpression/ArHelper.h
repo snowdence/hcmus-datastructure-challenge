@@ -33,4 +33,32 @@ public:
 		}
 		return balance_filter;
 	}
+	std::string getPoint(std::string x)
+	{
+		return x.substr(x.find(".") +1 , x.length());
+	}
+	static double parseTwoPointDouble(string x) {
+		if (x.find(".") != std::string::npos) {
+			int p_idx = x.find(".");
+			
+			int max_limit = x.find(".") + 2;
+			if (max_limit != x.length() - 1) {
+				throw  exception("Invalid double ");
+			}
+			max_limit = (max_limit > x.length() ? x.length() : max_limit);
+			
+			for (int i = 0; i < x.length(); i++) {
+				if (!isdigit(x[i]) && x[i] != '.') {
+					throw exception("Invalid double" );
+					return -1;
+				}
+			}
+			string sub_d = x.substr(0, max_limit + 1);
+			return stod(sub_d);
+			
+		}
+		else {
+			return stod(x);
+		}
+	}
 };

@@ -7,7 +7,7 @@
 #include "ArConfig.h"
 #include "ArExpException.h"
 #include "ArHelper.h"
-
+#include <sstream>
 using namespace std;
 class ArExpConverter
 {
@@ -27,6 +27,71 @@ public:
 			return 3;
 		return 0;
 	}
+
+	double evaluate() {
+		double result = 0;
+
+		string temp = "";
+		double cur_tk_value = 0;
+
+		stack<double> evalutate;
+		string tok = "";
+
+
+		if (_arexp.getFormType() == ExpForm::INFIX_EXP) {
+			_arexp = this->infix_to_postfix();
+		}
+
+		string expr = _arexp.to_string();
+
+		int i = 0;
+		vector<string> O;
+		while ((tok = next_token(expr, i)) != "") {
+			if (tok == " ") {
+				continue;
+			}
+			O.push_back(tok);
+		}
+		for (int i = 0; i < O.size(); i++) {
+			string cur_tk_str = O[i];
+			if (!isOperator(cur_tk_str[0])) {
+				try {
+					cur_tk_value = ArHelper::parseTwoPointDouble(cur_tk_str);
+					evalutate.push(cur_tk_value);
+				}
+				catch (exception e) {
+					throw InvalidDoubleException();
+				}
+			}
+			else {
+				if (evalutate.size() < 2) {
+					throw InvalidExpressionException();
+				}
+
+				double val1 = evalutate.top();
+				evalutate.pop();
+				double val2 = evalutate.top();
+				evalutate.pop();
+				switch (cur_tk_str[0])
+				{
+				case '+': evalutate.push(val2 + val1); break;
+				case '-':  evalutate.push(val2 - val1); break;
+				case '*':  evalutate.push(val2 * val1); break;
+				case '/':  evalutate.push(val2 / val1); break;
+				case '^':  evalutate.push(pow(val2, val1)); break;
+				}
+			}
+			temp += " " + O[i];
+		}
+		if (evalutate.size() != 1) {
+			throw InvalidExpressionException();
+		}
+		else {
+			result = evalutate.top();
+		}
+		return result;
+	}
+
 	ArExp infix_to_prefix() {
 		string exp_str = _arexp.to_string();
 		// stack for operators. 
@@ -135,62 +200,47 @@ public:
 	}
 
 
-	// function to check if brackets are balanced 
 	bool areBracketsBalanced(string  str_expr)
 	{
 		string expr = ArHelper::filter_bracket(str_expr);
 
 		stack<char> s;
 		char x;
-
-		// Traversing the Expression 
 		for (int i = 0; i < expr.length(); i++)
 		{
-			if (expr[i] == '(' || expr[i] == '['
-				|| expr[i] == '{')
+			if (expr[i] == '(' || expr[i] == '[' || expr[i] == '{')
 			{
-				// Push the element in the stack 
 				s.push(expr[i]);
 				continue;
 			}
-
-			// IF current current character is not opening 
-			// bracket, then it must be closing. So stack 
-			// cannot be empty at this point. 
-			if (s.empty())
+			if (s.empty()) {
 				return false;
+			}
 
 			switch (expr[i]) {
-			case ')':
+				case ')':
+					x = s.top();
+					s.pop();
+					if (x == '{' || x == '[')
+						return false;
+					break;
 
-				// Store the top element in a 
-				x = s.top();
-				s.pop();
-				if (x == '{' || x == '[')
-					return false;
-				break;
+				case '}':
+					x = s.top();
+					s.pop();
+					if (x == '(' || x == '[')
+						return false;
+					break;
 
-			case '}':
-
-				// Store the top element in b 
-				x = s.top();
-				s.pop();
-				if (x == '(' || x == '[')
-					return false;
-				break;
-
-			case ']':
-
-				// Store the top element in c 
-				x = s.top();
-				s.pop();
-				if (x == '(' || x == '{')
-					return false;
-				break;
+				case ']':
+					x = s.top();
+					s.pop();
+					if (x == '(' || x == '{')
+						return false;
+					break;
 			}
 		}
 
-		// Check Empty Stack 
 		return (s.empty());
 	}
 
@@ -227,6 +277,52 @@ public:
 
 		}
 		return result;
+	}
+	
+
+	string get_valid_postfix(vector<string> O ){ 
+		string temp = "";
+		double cur_tk_value = 0;
+		stack<double> evalutate;
+		for (int i = 0; i < O.size(); i++) {
+			string cur_tk_str = O[i];
+
+			if (!isOperator(cur_tk_str[0])) {
+				//operant
+				try{
+					cur_tk_value = ArHelper::parseTwoPointDouble(cur_tk_str);
+					evalutate.push(cur_tk_value);
+				}
+				catch (exception e) {
+					throw InvalidDoubleException(); 
+				}
+			}
+			else {
+				if (evalutate.size() < 2) {
+					throw InvalidExpressionException();
+				}
+				
+				double val1 = evalutate.top();
+				evalutate.pop();
+				double val2 = evalutate.top();
+				evalutate.pop();
+				switch (cur_tk_str[0])
+				{
+				case '+': evalutate.push(val2 + val1); break;
+				case '-':  evalutate.push(val2 - val1); break;
+				case '*':  evalutate.push(val2 * val1); break;
+				case '/':  evalutate.push(val2 / val1); break;
+				case '^':  evalutate.push(pow(val2, val1)); break;
+				}
+			}
+			temp += " " + O[i];
+		}
+		if (evalutate.size() != 1) {
+			throw InvalidExpressionException();
+		}
+	
+		temp = ArHelper::trim(temp);
+		return temp;
 	}
 
 	ArExp infix_to_postfix() {
@@ -272,8 +368,12 @@ public:
 				}
 			}
 			else if (isOperator(tok[0])) {
+				//Version 1: BUG 2 ^ 2 ^ 2 priority not true
+
+				//while (!S.empty() &&  priority(tok[0]) <= priority(S.top()[0]))
 				while (!S.empty() && isOperator(S.top()[0]) && ((leftAssoc(tok[0]) && priority(tok[0]) <= priority(S.top()[0])) || (!leftAssoc(tok[0]) && priority(tok[0]) < priority(S.top()[0]))))
 				{
+					// ^ begin from right
 					string s_top = S.top();
 					O.push_back(s_top);
 					S.pop();
@@ -295,38 +395,9 @@ public:
 		}
 
 		if (O.empty()) throw InvalidExpressionException();
+			
+		string temp = get_valid_postfix(O);
 
-		string temp = "";
-		int cur_tk_value = 0;
-		stack<int> evalutate;
-		for (int i = 0; i < O.size(); i++) {
-			string cur_tk_str = O[i];
-
-			if (!isOperator(cur_tk_str[0])) {
-				//operant
-				cur_tk_value = atoi(cur_tk_str.c_str());
-				evalutate.push(cur_tk_value);
-			}
-			else {
-
-				int val1 = evalutate.top();
-				evalutate.pop();
-				int val2 = evalutate.top();
-				evalutate.pop();
-				switch (cur_tk_str[0])
-				{
-				case '+': evalutate.push(val2 + val1); break;
-				case '-':  evalutate.push(val2 - val1); break;
-				case '*':  evalutate.push(val2 * val1); break;
-				case '/':  evalutate.push(val2 / val1); break;
-				case '^':  evalutate.push(pow(val2, val1)); break;
-				}
-			}
-			temp += " " + O[i];
-		}
-
-
-		temp = ArHelper::trim(temp);
 #ifdef AR_EXP_DEBUG
 		cout << "[" << temp << "]" << endl;
 #endif // AR_EXP_DEBUG

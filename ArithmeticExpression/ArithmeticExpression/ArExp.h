@@ -3,6 +3,9 @@
 #include <string>
 #include "ExpForm.h"
 #include "ArHelper.h"
+#include  <stack>
+#include <vector>
+#include "ArExpException.h"
 using namespace std;
 
 
@@ -22,8 +25,25 @@ public:
 	bool isValid() {
 		return true;
 	}
-	int evaluate(){
-		return -1;
+	ExpForm getFormType() {
+		return this->_exp_form;
+	}
+	string next_token(string str, int& i) {
+		string b = "";
+		string expr = str;
+		while (i < expr.length() && expr[i] == ' ') i++;
+		if (i == expr.length()) return "";
+		while (i < expr.length() && expr[i] != ' ' && expr[i] != '(' && expr[i] != ')' && !isOperator(expr[i])) {
+			b += expr[i++];
+		}
+		if (b != "") return b;
+		return  string(1, expr[i++]);
+
+	}
+
+
+	bool isOperator(char c) {
+		return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
 	}
 
 	ArExp(string exp, ExpForm form)  {
@@ -34,6 +54,7 @@ public:
 		_exp = exp;
 		this->trim_space(); // chuan hoa 
 	}
+	
 	
 	void trim_space()
 	{
