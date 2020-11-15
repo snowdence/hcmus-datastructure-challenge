@@ -319,6 +319,7 @@ public:
 				case '-':  evalutate.push(val2 - val1); break;
 				case '*':  evalutate.push(val2 * val1); break;
 				case '/':  evalutate.push(val2 / val1); break;
+				case '^':  evalutate.push(pow(val2, val1)); break;
 				}
 			}
 			temp += " " + O[i];

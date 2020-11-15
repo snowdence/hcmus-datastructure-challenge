@@ -5,15 +5,13 @@
 using namespace std;
 int main()
 {
-	ArExp exp("[(2 + 3) + 3] * 2");
+	ArExp exp("[(2 + 3) ^ 3] * 2");
 	cout << exp.to_string() << endl;;
 	ArExpConverter converter(exp);
 	cout << "Convert to postfix: " << endl;
 	//cout << converter.infix_to_prefix().to_string() << endl;
 	try {
 		ArExp converted = converter.infix_to_postfix();
-
-
 		std::cout << converted.to_string() << endl;
 	}
 	catch (MismatchedParenthesisException e) {
