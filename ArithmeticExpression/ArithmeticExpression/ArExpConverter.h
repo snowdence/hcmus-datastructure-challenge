@@ -333,7 +333,6 @@ public:
 			throw NotBalanceBracketExpressionException();
 		}
 		if (basic_validate_infix(expr) == false) {
-			cout << "Error infix" << endl;
 			throw InvalidExpressionException();
 		}
 
@@ -381,7 +380,13 @@ public:
 				S.push(tok);
 			}
 			else {
-				O.push_back(tok);
+				try {
+					double cur = ArHelper::parseTwoPointDouble(tok);
+					O.push_back(tok);
+				}
+				catch (exception e) {
+					throw InvalidDoubleException();
+				}
 			}
 		}
 		while (!S.empty()) {
