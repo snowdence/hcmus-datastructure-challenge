@@ -19,6 +19,16 @@ public:
 	}
 };
 
+class NotBalanceBracketExpressionException : public exception
+{
+public:
+	virtual const char* what() const throw()
+	{
+		return "Not balanced bracket.";
+	}
+};
+
+
 
 class InvalidExpressionException : public exception
 {

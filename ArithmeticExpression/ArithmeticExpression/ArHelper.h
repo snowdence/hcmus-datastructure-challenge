@@ -1,5 +1,7 @@
 #pragma once
+#include <iostream>
 #include <string>
+using namespace std;
 class ArHelper
 {
 public:
@@ -18,5 +20,17 @@ public:
 	{
 		str.erase(str.find_last_not_of(chars) + 1);
 		return str;
+	}
+	static std::string filter_bracket(std::string& str)
+	{
+		string balance_filter = "";
+		for (int i = 0; i < str.size(); i++) {
+			char c = str[i];
+			if (c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}')
+			{
+				balance_filter += c; 
+			}
+		}
+		return balance_filter;
 	}
 };
