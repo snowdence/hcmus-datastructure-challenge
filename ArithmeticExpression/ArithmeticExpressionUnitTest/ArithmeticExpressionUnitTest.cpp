@@ -28,8 +28,13 @@ namespace ArithmeticExpressionUnitTest
 		}
 		TEST_METHOD(testInfixConvert) {
 			ArExpConverter converter(ArExp("3^2/(5 * 3) + 10"));
-			Assert::IsTrue("3 2 ^ 5 3 * / 10 +" == converter.infix_to_postfix());
-			//3 2 ^ 5 3 * / 10 +]
+			Assert::IsTrue("3 2 ^ 5 3 * / 10 +" == converter.infix_to_postfix().to_string());
+		}
+
+		TEST_METHOD(testInfixConvertException) {
+			ArExpConverter converter(ArExp("4 4 3 + -"));
+			ArExp result = converter.infix_to_postfix();
+			Assert::IsTrue("3 2 ^ 5 3 * / 10 +" == result.to_string() );
 		}
 	};
 }

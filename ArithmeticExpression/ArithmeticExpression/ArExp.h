@@ -56,10 +56,4 @@ public:
 	friend inline bool operator==(const string& lhs, const ArExp& rhs) {
 		return (ArExp(lhs) == rhs);
 	}
-
-
-
-	
-
 };
-

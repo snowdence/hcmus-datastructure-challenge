@@ -5,7 +5,7 @@
 using namespace std;
 int main()
 {
-    ArExp exp("3^2/(5 * 3) + 10");
+    ArExp exp("4 4 3 +");
     cout << exp.to_string() << endl;;
     ArExpConverter converter(exp);
     cout << "Convert to postfix: " << endl;

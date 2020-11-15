@@ -153,7 +153,9 @@ public:
 					O.push(s_top);
 					S.pop();
 				}
-				if (S.empty()) throw MismatchedParenthesisException();
+				if (S.empty()) {
+					throw MismatchedParenthesisException();
+				}
 				S.pop();
 			}
 			else if (isOperator(tok[0])) {
@@ -170,13 +172,17 @@ public:
 			}
 		}
 		while (!S.empty()) {
-			if (!isOperator(S.top()[0])) throw MismatchedParenthesisException();
+			if (!isOperator(S.top()[0])) {
+				throw MismatchedParenthesisException();
+			}
 			string s_top = S.top();
 			O.push(s_top);
 			S.pop();
 		}
 
-		if (O.empty()) return ArExp("Invalid expression.");
+		if (O.empty()) {
+			throw exception("Invalid expression.");
+		}
 		string temp = "";
 		while (!O.empty()) {
 			temp = O.top() + " "+ temp;

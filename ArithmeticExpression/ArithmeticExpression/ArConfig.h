@@ -1,2 +1,2 @@
 #pragma once
-//#define AR_EXP_DEBUG
+#define AR_EXP_DEBUG

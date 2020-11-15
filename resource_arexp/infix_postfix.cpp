@@ -1,9 +1,9 @@
 /* This program converts infix expression to postfix expression.
- * This program assume that there are Five operators: (*, /, +, -,^)
+Â * This program assume that there are Five operators: (*, /, +, -,^)
 	in infix expression and operands can be of single-digit only.
- * This program will not work for fractional numbers.
- * Further this program does not check whether infix expression is
- valid or not in terms of number of operators and operands.*/
+Â * This program will not work for fractional numbers.
+Â * Further this program does not check whether infix expression is
+Â valid or not in terms of number of operators and operands.*/
 #define _CRT_SECURE_NO_WARNINGS
 #include<stdio.h>
 #include<stdlib.h>      /* for exit() */
