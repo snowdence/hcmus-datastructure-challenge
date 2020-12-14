@@ -15,6 +15,12 @@ private:
 	vector<vector<int>> _adj_matrix;
 public:
 	Graph() {}
+	vector<vector<int>> getList() {
+		return _adj_list;
+	}
+	vector<vector<int>> getMatrix() {
+		return _adj_matrix;
+	}
 	void readFromFile(string file) {
 	
 	}
